@@ -30,16 +30,15 @@ class Visualize extends Component {
         try {
             const response = await fetch("http://localhost:3001/api/sensor/get");
             const responseData = await response.json();
-    
+
             // Assuming responseData is an object with a 'data' property containing the array
-            const data = responseData.data || []; 
-    
+            const data = responseData.data || [];
+
             this.setState({ sensorData: data, filteredData: data });
         } catch (error) {
             console.error("Error fetching sensor data:", error);
         }
     };
-    
 
     handleFilterChange = (e, { value }) => {
         this.setState({ filterOption: value }, this.applyFilter);
@@ -57,7 +56,7 @@ class Visualize extends Component {
     };
 
     render() {
-        const { filteredData } = this.state;
+        const { filteredData, filterOption } = this.state;
         const filterOptions = [
             { key: 'all', value: 'all', text: 'All' },
             { key: 'temperature', value: 'temperature', text: 'Temperature' },
@@ -79,15 +78,25 @@ class Visualize extends Component {
                             style={{ marginBottom: '20px' }}
                         />
                     </Grid.Row>
-                    <Grid.Row>
-                        <SensorChart1 data={filteredData.filter(item => item.type === 'humidity')} />
-                    </Grid.Row>
-                    <Grid.Row>
-                        <SensorChart3 data={filteredData.filter(item => item.type === 'light')} />
-                    </Grid.Row>
-                    <Grid.Row>
-                        <SensorChart2 data={filteredData.filter(item => item.type === 'temperature')} />
-                    </Grid.Row>
+
+                    {filterOption === 'all' || filterOption === 'humidity' ? (
+                        <Grid.Row>
+                            <SensorChart1 data={filteredData.filter(item => item.type === 'humidity')} />
+                        </Grid.Row>
+                    ) : null}
+                    
+                    {filterOption === 'all' || filterOption === 'light' ? (
+                        <Grid.Row>
+                            <SensorChart3 data={filteredData.filter(item => item.type === 'light')} />
+                        </Grid.Row>
+                    ) : null}
+                    
+                    {filterOption === 'all' || filterOption === 'temperature' ? (
+                        <Grid.Row>
+                            <SensorChart2 data={filteredData.filter(item => item.type === 'temperature')} />
+                        </Grid.Row>
+                    ) : null}
+
                     <Grid.Row>
                         <Button>
                             <CSVLink data={filteredData} filename={"sensor-data.csv"}>
